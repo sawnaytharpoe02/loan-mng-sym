@@ -45,3 +45,5 @@ coverage/
 # Production/Docker
 .docker/
 docker-compose.override.yml
+
+package-lock.json
