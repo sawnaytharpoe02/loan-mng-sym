@@ -6,19 +6,23 @@ import { ApiResponse } from "../../utils/api-response";
 export class InterestRateController {
     private interestRateService = container.resolve<InterestRateService>("InterestRateService");
 
-    findAll = async (_req: Request, res: Response, next: NextFunction) => {
+    findAll = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const rates = await this.interestRateService.findAll();
-            ApiResponse.ok(res, "Interest rates retrieved successfully", rates);
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            const result = await this.interestRateService.findAll(page, limit);
+            ApiResponse.paginatedSuccess(res, "Interest rates retrieved successfully", result.data, result.pagination);
         } catch (error) {
             next(error);
         }
     };
 
-    findActive = async (_req: Request, res: Response, next: NextFunction) => {
+    findActive = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const rates = await this.interestRateService.findActive();
-            ApiResponse.ok(res, "Active interest rates retrieved successfully", rates);
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            const result = await this.interestRateService.findActive(page, limit);
+            ApiResponse.paginatedSuccess(res, "Active interest rates retrieved successfully", result.data, result.pagination);
         } catch (error) {
             next(error);
         }

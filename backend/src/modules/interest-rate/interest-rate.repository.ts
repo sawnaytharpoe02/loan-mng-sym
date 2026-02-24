@@ -7,12 +7,20 @@ export class InterestRateRepository {
         return InterestRate.create(data);
     }
 
-    async findAll(): Promise<IInterestRate[]> {
-        return InterestRate.find().sort({ rate: 1 });
+    async findAll(skip: number = 0, limit: number = 10): Promise<{ data: IInterestRate[], total: number }> {
+        const [data, total] = await Promise.all([
+            InterestRate.find().sort({ rate: 1 }).skip(skip).limit(limit),
+            InterestRate.countDocuments()
+        ]);
+        return { data, total };
     }
 
-    async findActive(): Promise<IInterestRate[]> {
-        return InterestRate.find({ isActive: true }).sort({ rate: 1 });
+    async findActive(skip: number = 0, limit: number = 10): Promise<{ data: IInterestRate[], total: number }> {
+        const [data, total] = await Promise.all([
+            InterestRate.find({ isActive: true }).sort({ rate: 1 }).skip(skip).limit(limit),
+            InterestRate.countDocuments({ isActive: true })
+        ]);
+        return { data, total };
     }
 
     async findById(id: string): Promise<IInterestRate | null> {

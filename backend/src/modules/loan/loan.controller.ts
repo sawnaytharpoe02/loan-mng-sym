@@ -15,10 +15,12 @@ export class LoanController {
         }
     };
 
-    findAll = async (_req: Request, res: Response, next: NextFunction) => {
+    findAll = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const loans = await this.loanService.findAll();
-            ApiResponse.ok(res, "Loans retrieved successfully", loans);
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            const result = await this.loanService.findAll(page, limit);
+            ApiResponse.paginatedSuccess(res, "Loans retrieved successfully", result.data, result.pagination);
         } catch (error) {
             next(error);
         }
@@ -35,8 +37,10 @@ export class LoanController {
 
     findByBorrowerId = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const loans = await this.loanService.findByBorrowerId(req.params.borrowerId);
-            ApiResponse.ok(res, "Loans retrieved successfully", loans);
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            const result = await this.loanService.findByBorrowerId(req.params.borrowerId, page, limit);
+            ApiResponse.paginatedSuccess(res, "Loans retrieved successfully", result.data, result.pagination);
         } catch (error) {
             next(error);
         }

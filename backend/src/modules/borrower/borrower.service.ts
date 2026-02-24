@@ -17,8 +17,23 @@ export class BorrowerService {
         return this.borrowerRepository.create(data);
     }
 
-    async findAll() {
-        return this.borrowerRepository.findAll();
+    async findAll(page: number = 1, limit: number = 10) {
+        const skip = (page - 1) * limit;
+        const { data, total } = await this.borrowerRepository.findAll(skip, limit);
+
+        const totalPages = Math.ceil(total / limit);
+
+        return {
+            data,
+            pagination: {
+                hasNextPage: page < totalPages,
+                hasPreviousPage: page > 1,
+                pageSize: limit,
+                totalItems: total,
+                currentPage: page,
+                totalPages
+            }
+        };
     }
 
     async findById(id: string) {

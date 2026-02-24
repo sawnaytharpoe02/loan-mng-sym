@@ -26,10 +26,12 @@ export class ContractController {
         }
     };
 
-    findAll = async (_req: Request, res: Response, next: NextFunction) => {
+    findAll = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const contracts = await this.contractService.findAll();
-            ApiResponse.ok(res, "Contracts retrieved successfully", contracts);
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            const result = await this.contractService.findAll(page, limit);
+            ApiResponse.paginatedSuccess(res, "Contracts retrieved successfully", result.data, result.pagination);
         } catch (error) {
             next(error);
         }
@@ -37,8 +39,10 @@ export class ContractController {
 
     findByLoanId = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const contracts = await this.contractService.findByLoanId(req.params.loanId);
-            ApiResponse.ok(res, "Contracts retrieved successfully", contracts);
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            const result = await this.contractService.findByLoanId(req.params.loanId, page, limit);
+            ApiResponse.paginatedSuccess(res, "Contracts retrieved successfully", result.data, result.pagination);
         } catch (error) {
             next(error);
         }

@@ -35,12 +35,38 @@ export class ContractService {
         });
     }
 
-    async findByLoanId(loanId: string) {
-        return this.contractRepository.findByLoanId(loanId);
+    async findByLoanId(loanId: string, page: number = 1, limit: number = 10) {
+        const skip = (page - 1) * limit;
+        const { data, total } = await this.contractRepository.findByLoanId(loanId, skip, limit);
+        const totalPages = Math.ceil(total / limit);
+        return {
+            data,
+            pagination: {
+                hasNextPage: page < totalPages,
+                hasPreviousPage: page > 1,
+                pageSize: limit,
+                totalItems: total,
+                currentPage: page,
+                totalPages
+            }
+        };
     }
 
-    async findAll() {
-        return this.contractRepository.findAll();
+    async findAll(page: number = 1, limit: number = 10) {
+        const skip = (page - 1) * limit;
+        const { data, total } = await this.contractRepository.findAll(skip, limit);
+        const totalPages = Math.ceil(total / limit);
+        return {
+            data,
+            pagination: {
+                hasNextPage: page < totalPages,
+                hasPreviousPage: page > 1,
+                pageSize: limit,
+                totalItems: total,
+                currentPage: page,
+                totalPages
+            }
+        };
     }
 
     async findById(id: string) {

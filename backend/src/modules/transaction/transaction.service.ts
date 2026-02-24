@@ -35,12 +35,38 @@ export class TransactionService {
         return transaction;
     }
 
-    async findByLoanId(loanId: string) {
-        return this.transactionRepository.findByLoanId(loanId);
+    async findByLoanId(loanId: string, page: number = 1, limit: number = 10) {
+        const skip = (page - 1) * limit;
+        const { data, total } = await this.transactionRepository.findByLoanId(loanId, skip, limit);
+        const totalPages = Math.ceil(total / limit);
+        return {
+            data,
+            pagination: {
+                hasNextPage: page < totalPages,
+                hasPreviousPage: page > 1,
+                pageSize: limit,
+                totalItems: total,
+                currentPage: page,
+                totalPages
+            }
+        };
     }
 
-    async findAll() {
-        return this.transactionRepository.findAll();
+    async findAll(page: number = 1, limit: number = 10) {
+        const skip = (page - 1) * limit;
+        const { data, total } = await this.transactionRepository.findAll(skip, limit);
+        const totalPages = Math.ceil(total / limit);
+        return {
+            data,
+            pagination: {
+                hasNextPage: page < totalPages,
+                hasPreviousPage: page > 1,
+                pageSize: limit,
+                totalItems: total,
+                currentPage: page,
+                totalPages
+            }
+        };
     }
 
     async findById(id: string) {

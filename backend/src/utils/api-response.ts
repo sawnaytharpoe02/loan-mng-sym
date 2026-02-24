@@ -1,11 +1,21 @@
 import { STATUS_CODES, StatusCode } from "../constants/status-codes";
 import type { Response } from "express";
 
+export interface PaginationMeta {
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    pageSize: number;
+    totalItems: number;
+    currentPage: number;
+    totalPages: number;
+}
+
 type ApiResponseParams<T> = {
     success: boolean;
     message: string;
     statusCode: StatusCode;
     data?: T | null;
+    pagination?: PaginationMeta;
     errors?: unknown;
 };
 
@@ -14,6 +24,7 @@ export class ApiResponse<T = unknown> {
     public readonly message: string;
     public readonly statusCode: StatusCode;
     public readonly data?: T | null;
+    public readonly pagination?: PaginationMeta;
     public readonly errors?: unknown;
 
     constructor({
@@ -21,12 +32,14 @@ export class ApiResponse<T = unknown> {
         message,
         statusCode,
         data = null,
+        pagination,
         errors
     }: ApiResponseParams<T>) {
         this.success = success;
         this.message = message;
         this.statusCode = statusCode;
         this.data = data;
+        this.pagination = pagination;
         this.errors = errors;
     }
 
@@ -36,6 +49,7 @@ export class ApiResponse<T = unknown> {
             message: this.message,
             statusCode: this.statusCode,
             ...(this.data !== undefined && { data: this.data }),
+            ...(this.pagination !== undefined && { pagination: this.pagination }),
             ...(this.errors !== undefined && { errors: this.errors })
         });
     }
@@ -50,6 +64,22 @@ export class ApiResponse<T = unknown> {
             success: true,
             message,
             data,
+            statusCode
+        }).send(res);
+    }
+
+    static paginatedSuccess<T>(
+        res: Response,
+        message: string,
+        data: T,
+        pagination: PaginationMeta,
+        statusCode: StatusCode = STATUS_CODES.OK
+    ): Response {
+        return new ApiResponse<T>({
+            success: true,
+            message,
+            data,
+            pagination,
             statusCode
         }).send(res);
     }

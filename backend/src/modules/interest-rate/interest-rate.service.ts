@@ -26,12 +26,38 @@ export class InterestRateService {
         logger.info("Interest rates seeded successfully");
     }
 
-    async findAll() {
-        return this.interestRateRepository.findAll();
+    async findAll(page: number = 1, limit: number = 10) {
+        const skip = (page - 1) * limit;
+        const { data, total } = await this.interestRateRepository.findAll(skip, limit);
+        const totalPages = Math.ceil(total / limit);
+        return {
+            data,
+            pagination: {
+                hasNextPage: page < totalPages,
+                hasPreviousPage: page > 1,
+                pageSize: limit,
+                totalItems: total,
+                currentPage: page,
+                totalPages
+            }
+        };
     }
 
-    async findActive() {
-        return this.interestRateRepository.findActive();
+    async findActive(page: number = 1, limit: number = 10) {
+        const skip = (page - 1) * limit;
+        const { data, total } = await this.interestRateRepository.findActive(skip, limit);
+        const totalPages = Math.ceil(total / limit);
+        return {
+            data,
+            pagination: {
+                hasNextPage: page < totalPages,
+                hasPreviousPage: page > 1,
+                pageSize: limit,
+                totalItems: total,
+                currentPage: page,
+                totalPages
+            }
+        };
     }
 
     async findById(id: string) {

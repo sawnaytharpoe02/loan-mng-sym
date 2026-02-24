@@ -1,4 +1,9 @@
 {
   "name": "loan-mng-sym",
-  "private": true
+  "private": true,
+  "workspaces": [
+    "shared",
+    "backend",
+    "frontend"
+  ]
 }

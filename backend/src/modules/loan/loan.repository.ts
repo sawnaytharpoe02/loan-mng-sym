@@ -8,16 +8,24 @@ export class LoanRepository {
         return Loan.create(data);
     }
 
-    async findAll(): Promise<ILoan[]> {
-        return Loan.find().populate("borrowerId", "fullName email phone").sort({ createdAt: -1 });
+    async findAll(skip: number = 0, limit: number = 10): Promise<{ data: ILoan[], total: number }> {
+        const [data, total] = await Promise.all([
+            Loan.find().populate("borrowerId", "fullName email phone").sort({ createdAt: -1 }).skip(skip).limit(limit),
+            Loan.countDocuments()
+        ]);
+        return { data, total };
     }
 
     async findById(id: string): Promise<ILoan | null> {
         return Loan.findById(id).populate("borrowerId", "fullName email phone identificationNumber address");
     }
 
-    async findByBorrowerId(borrowerId: string): Promise<ILoan[]> {
-        return Loan.find({ borrowerId }).sort({ createdAt: -1 });
+    async findByBorrowerId(borrowerId: string, skip: number = 0, limit: number = 10): Promise<{ data: ILoan[], total: number }> {
+        const [data, total] = await Promise.all([
+            Loan.find({ borrowerId }).sort({ createdAt: -1 }).skip(skip).limit(limit),
+            Loan.countDocuments({ borrowerId })
+        ]);
+        return { data, total };
     }
 
     async update(id: string, data: Partial<ILoan>): Promise<ILoan | null> {

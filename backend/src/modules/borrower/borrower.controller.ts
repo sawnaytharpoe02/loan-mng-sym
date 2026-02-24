@@ -15,10 +15,12 @@ export class BorrowerController {
         }
     };
 
-    findAll = async (_req: Request, res: Response, next: NextFunction) => {
+    findAll = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const borrowers = await this.borrowerService.findAll();
-            ApiResponse.ok(res, "Borrowers retrieved successfully", borrowers);
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            const result = await this.borrowerService.findAll(page, limit);
+            ApiResponse.paginatedSuccess(res, "Borrowers retrieved successfully", result.data, result.pagination);
         } catch (error) {
             next(error);
         }

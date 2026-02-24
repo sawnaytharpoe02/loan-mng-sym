@@ -15,10 +15,12 @@ export class TransactionController {
         }
     };
 
-    findAll = async (_req: Request, res: Response, next: NextFunction) => {
+    findAll = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const transactions = await this.transactionService.findAll();
-            ApiResponse.ok(res, "Transactions retrieved successfully", transactions);
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            const result = await this.transactionService.findAll(page, limit);
+            ApiResponse.paginatedSuccess(res, "Transactions retrieved successfully", result.data, result.pagination);
         } catch (error) {
             next(error);
         }
@@ -26,8 +28,10 @@ export class TransactionController {
 
     findByLoanId = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const transactions = await this.transactionService.findByLoanId(req.params.loanId);
-            ApiResponse.ok(res, "Transactions retrieved successfully", transactions);
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            const result = await this.transactionService.findByLoanId(req.params.loanId, page, limit);
+            ApiResponse.paginatedSuccess(res, "Transactions retrieved successfully", result.data, result.pagination);
         } catch (error) {
             next(error);
         }

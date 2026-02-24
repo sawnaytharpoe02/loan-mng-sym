@@ -7,16 +7,24 @@ export class ContractRepository {
         return Contract.create(data);
     }
 
-    async findByLoanId(loanId: string): Promise<IContract[]> {
-        return Contract.find({ loanId }).sort({ createdAt: -1 });
+    async findByLoanId(loanId: string, skip: number = 0, limit: number = 10): Promise<{ data: IContract[], total: number }> {
+        const [data, total] = await Promise.all([
+            Contract.find({ loanId }).sort({ createdAt: -1 }).skip(skip).limit(limit),
+            Contract.countDocuments({ loanId })
+        ]);
+        return { data, total };
     }
 
     async findById(id: string): Promise<IContract | null> {
         return Contract.findById(id).populate("loanId");
     }
 
-    async findAll(): Promise<IContract[]> {
-        return Contract.find().populate("loanId").sort({ createdAt: -1 });
+    async findAll(skip: number = 0, limit: number = 10): Promise<{ data: IContract[], total: number }> {
+        const [data, total] = await Promise.all([
+            Contract.find().populate("loanId").sort({ createdAt: -1 }).skip(skip).limit(limit),
+            Contract.countDocuments()
+        ]);
+        return { data, total };
     }
 
     async delete(id: string): Promise<IContract | null> {

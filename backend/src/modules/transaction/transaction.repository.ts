@@ -7,12 +7,20 @@ export class TransactionRepository {
         return Transaction.create(data);
     }
 
-    async findByLoanId(loanId: string): Promise<ITransaction[]> {
-        return Transaction.find({ loanId }).sort({ transactionDate: -1 });
+    async findByLoanId(loanId: string, skip: number = 0, limit: number = 10): Promise<{ data: ITransaction[], total: number }> {
+        const [data, total] = await Promise.all([
+            Transaction.find({ loanId }).sort({ transactionDate: -1 }).skip(skip).limit(limit),
+            Transaction.countDocuments({ loanId })
+        ]);
+        return { data, total };
     }
 
-    async findAll(): Promise<ITransaction[]> {
-        return Transaction.find().populate("loanId").sort({ createdAt: -1 });
+    async findAll(skip: number = 0, limit: number = 10): Promise<{ data: ITransaction[], total: number }> {
+        const [data, total] = await Promise.all([
+            Transaction.find().populate("loanId").sort({ createdAt: -1 }).skip(skip).limit(limit),
+            Transaction.countDocuments()
+        ]);
+        return { data, total };
     }
 
     async findById(id: string): Promise<ITransaction | null> {
