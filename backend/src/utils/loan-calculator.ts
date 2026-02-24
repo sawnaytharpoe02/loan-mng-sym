@@ -1,71 +1,88 @@
 /**
- * Loan Calculator Utility
+ * Loan Calculator Utility (Industry called Equated Monthly Installment (EMI))
  * Calculates monthly repayment using the amortization formula:
  * M = P * [r(1+r)^n] / [(1+r)^n - 1]
  * Where: P = principal, r = monthly interest rate, n = number of months
  */
 
+
+/**
+ * Interest Rate depend on loan type 
+ * 5 - mortgage
+ * 10 - education
+ * 15 - business
+ * 20 - personal
+ */
+
+import Decimal from "decimal.js";
+
 export interface LoanCalculation {
-    monthlyPayment: number;
-    totalPayment: number;
-    totalInterest: number;
+    monthlyPayment: string;
+    totalPayment: string;
+    totalInterest: string;
     amortizationSchedule: AmortizationEntry[];
 }
 
 export interface AmortizationEntry {
     month: number;
-    payment: number;
-    principal: number;
-    interest: number;
-    balance: number;
+    payment: string;
+    principal: string;
+    interest: string;
+    balance: string;
 }
 
 export function calculateLoan(
-    principal: number,
-    annualRate: number,
+    principalStr: string,
+    annualRateStr: string,
     termMonths: number
 ): LoanCalculation {
-    const monthlyRate = annualRate / 100 / 12;
+    const principal = new Decimal(principalStr);
+    const annualRate = new Decimal(annualRateStr);
+    const monthlyRate = annualRate.div(100).div(12);
 
-    let monthlyPayment: number;
+    let monthlyPayment: Decimal;
 
-    if (monthlyRate === 0) {
-        monthlyPayment = principal / termMonths;
+    if (monthlyRate.isZero()) {
+        monthlyPayment = principal.div(termMonths);
     } else {
-        const factor = Math.pow(1 + monthlyRate, termMonths);
-        monthlyPayment = principal * (monthlyRate * factor) / (factor - 1);
+        const factor = new Decimal(1).plus(monthlyRate).pow(termMonths);
+        monthlyPayment = principal.mul(monthlyRate).mul(factor).div(factor.minus(1));
     }
 
-    monthlyPayment = Math.round(monthlyPayment * 100) / 100;
+    // EMI gets rounded here
+    const monthlyPaymentStr = monthlyPayment.toDecimalPlaces(0, Decimal.ROUND_HALF_UP).toString();
+    const actualMonthlyPayment = new Decimal(monthlyPaymentStr);
 
     const amortizationSchedule: AmortizationEntry[] = [];
     let balance = principal;
 
     for (let month = 1; month <= termMonths; month++) {
-        const interestPayment = Math.round(balance * monthlyRate * 100) / 100;
-        const principalPayment = Math.round((monthlyPayment - interestPayment) * 100) / 100;
-        balance = Math.round((balance - principalPayment) * 100) / 100;
+        const interestPayment = balance.mul(monthlyRate).toDecimalPlaces(0, Decimal.ROUND_HALF_UP);
+        let principalPayment = actualMonthlyPayment.minus(interestPayment);
+        balance = balance.minus(principalPayment);
 
         if (month === termMonths) {
-            balance = 0;
+            // Adjust final payment to cover any rounding differences
+            principalPayment = principalPayment.plus(balance);
+            balance = new Decimal(0);
         }
 
         amortizationSchedule.push({
             month,
-            payment: monthlyPayment,
-            principal: principalPayment,
-            interest: interestPayment,
-            balance: Math.max(0, balance),
+            payment: monthlyPaymentStr,
+            principal: principalPayment.toString(),
+            interest: interestPayment.toString(),
+            balance: balance.greaterThan(0) ? balance.toString() : "0",
         });
     }
 
-    const totalPayment = Math.round(monthlyPayment * termMonths * 100) / 100;
-    const totalInterest = Math.round((totalPayment - principal) * 100) / 100;
+    const totalPayment = actualMonthlyPayment.mul(termMonths).toDecimalPlaces(0, Decimal.ROUND_HALF_UP);
+    const totalInterest = totalPayment.minus(principal).toDecimalPlaces(0, Decimal.ROUND_HALF_UP);
 
     return {
-        monthlyPayment,
-        totalPayment,
-        totalInterest,
+        monthlyPayment: monthlyPaymentStr,
+        totalPayment: totalPayment.toString(),
+        totalInterest: totalInterest.toString(),
         amortizationSchedule,
     };
 }

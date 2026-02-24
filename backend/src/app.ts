@@ -67,7 +67,7 @@ app.get("/api/health", (_req, res) => {
     ApiResponse.ok(res, "Server is running");
 });
 
-// Error handler
+// Global Error handler
 app.use(errorMiddleware);
 
 export default app;

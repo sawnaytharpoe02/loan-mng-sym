@@ -14,10 +14,10 @@ export class InterestRateService {
         if (count > 0) return;
 
         const rates = [
-            { rate: 5, description: "Low interest rate - 5%" },
-            { rate: 10, description: "Standard interest rate - 10%" },
-            { rate: 15, description: "Medium interest rate - 15%" },
-            { rate: 20, description: "High interest rate - 20%" },
+            { rate: "5", description: "Low interest rate - 5%" },
+            { rate: "10", description: "Standard interest rate - 10%" },
+            { rate: "15", description: "Medium interest rate - 15%" },
+            { rate: "20", description: "High interest rate - 20%" },
         ];
 
         for (const rate of rates) {

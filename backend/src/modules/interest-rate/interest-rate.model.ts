@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IInterestRate extends Document {
-    rate: number;
+    rate: string;
     description: string;
     isActive: boolean;
     createdAt: Date;
@@ -10,7 +10,7 @@ export interface IInterestRate extends Document {
 
 const interestRateSchema = new Schema<IInterestRate>(
     {
-        rate: { type: Number, required: true, enum: [5, 10, 15, 20] },
+        rate: { type: String, required: true, enum: ["5", "10", "15", "20"] },
         description: { type: String, default: "" },
         isActive: { type: Boolean, default: true },
     },
