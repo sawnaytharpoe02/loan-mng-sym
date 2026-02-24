@@ -15,7 +15,9 @@ const storage = multerS3({
     },
     key: (_req, file, cb) => {
         const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-        cb(null, `contracts/${uniqueSuffix}${path.extname(file.originalname)}`);
+        const extension = path.extname(file.originalname);
+        const folder = "contracts/";
+        cb(null, `${folder}${uniqueSuffix}${extension}`);
     },
 });
 
