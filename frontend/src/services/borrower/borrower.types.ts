@@ -8,7 +8,6 @@ export interface Borrower {
     phone: string;
     nrc: string;
     address: string;
-    dateOfBirth?: string;
     createdAt: string;
     updatedAt: string;
 }

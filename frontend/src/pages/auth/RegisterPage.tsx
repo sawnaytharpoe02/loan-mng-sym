@@ -12,6 +12,8 @@ import { Field, FieldContent, FieldError, FieldLabel } from "@/components/ui/fie
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRegister } from "@/services/auth/auth.mutations";
 import { useAuthStore } from "@/store/auth.store";
+import { isAxiosError } from "axios";
+import type { IResponse } from "@/types/api.types";
 
 export const RegisterPage: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -42,9 +44,12 @@ export const RegisterPage: React.FC = () => {
                 toast.success("Account created successfully!");
                 navigate("/");
             },
-            onError: (error: any) => {
-                const message = error.response?.data?.message || "Registration failed. Try again.";
-                toast.error(message);
+            onError: (err) => {
+                if (isAxiosError<IResponse>(err)) {
+                    toast.error(err.response?.data?.message || "Registration failed. Try again.");
+                } else {
+                    toast.error("Registration failed. Try again.");
+                }
             },
         });
     };

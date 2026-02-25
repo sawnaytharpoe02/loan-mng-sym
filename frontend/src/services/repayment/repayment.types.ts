@@ -1,9 +1,10 @@
 import type { IResponse, Params } from "../../types/api.types";
 import type { CreateRepaymentDTO } from "@loan-mng/shared";
+import type { Loan } from "../loan/loan.types";
 
 export interface Repayment {
     _id: string;
-    loanId: string | { _id: string; loanAmount: string };
+    loanId: string | Loan;
     amountPaid: string;
     paymentDate: string;
     paymentTerm?: number;

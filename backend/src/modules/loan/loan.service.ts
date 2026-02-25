@@ -61,9 +61,9 @@ export class LoanService {
         } as any);
     }
 
-    async findAll(page: number = 1, limit: number = 10) {
+    async findAll(page: number = 1, limit: number = 10, search?: string) {
         const skip = (page - 1) * limit;
-        const { data, total } = await this.loanRepository.findAll(skip, limit);
+        const { data, total } = await this.loanRepository.findAll(skip, limit, search);
         const totalPages = Math.ceil(total / limit);
         return {
             data,

@@ -8,6 +8,7 @@ import { RepaymentList } from "@/pages/repayment/RepaymentList";
 import { InterestRateList } from "@/pages/interest-rate/InterestRateList";
 import { TransactionList } from "@/pages/transaction/TransactionList";
 import { ContractList } from "@/pages/contract/ContractList";
+import { ContractGenerator } from "@/pages/contract/ContractGenerator";
 import { Dashboard } from "@/pages/dashboard/Dashboard";
 import { RegisterPage } from "./pages/auth/RegisterPage";
 
@@ -28,6 +29,7 @@ export default function App() {
                     <Route path="transactions" element={<TransactionList />} />
                     <Route path="interest-rates" element={<InterestRateList />} />
                     <Route path="contracts" element={<ContractList />} />
+                    <Route path="contracts/generator" element={<ContractGenerator />} />
                 </Route>
             </Route>
         </Routes>

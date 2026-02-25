@@ -6,6 +6,7 @@ import { Pagination } from "@/components/ui/pagination";
 import { useTransactions } from "@/services/transaction/transaction.queries";
 import type { Transaction } from "@/services/transaction/transaction.types";
 import { formatCurrency } from "@/lib/utils";
+import { Spinner } from "@/components/ui/spinner";
 
 const BADGE_VARIANT: Record<string, "default" | "secondary" | "destructive"> = {
     Repayment: "default",
@@ -21,7 +22,7 @@ export const TransactionList: React.FC = () => {
     const transactions: Transaction[] = response?.data || [];
     const pagination = response?.pagination;
 
-    if (isLoading) return <div className="p-8 text-center text-muted-foreground">Loading transactions...</div>;
+    if (isLoading) return <div className="flex items-center mx-auto w-fit p-8 space-x-2"><Spinner className="text-primary h-6 w-6" /><p className="text-center text-muted-foreground">Loading transactions ...</p></div>;
 
     return (
         <div className="p-6 space-y-6">

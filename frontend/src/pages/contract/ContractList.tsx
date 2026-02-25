@@ -7,11 +7,16 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Pagination } from "@/components/ui/pagination";
 import { DeleteDialog } from "@/components/ui/delete-dialog";
 import { useContracts } from "@/services/contract/contract.queries";
-import { useDeleteContract } from "@/services/contract/contract.mutations";
-import { MoreHorizontal, Plus, Trash2 } from "lucide-react";
+import { useDeleteContract, useDownloadContract } from "@/services/contract/contract.mutations";
+import { Link } from "react-router";
+import { MoreHorizontal, Plus, Trash2, FileText, Download } from "lucide-react";
 import { toast } from "sonner";
 import { ContractFormDialog } from "@/pages/contract/ContractFormDialog";
 import type { Contract } from "@/services/contract/contract.types";
+import { Spinner } from "@/components/ui/spinner";
+import { isAxiosError } from "axios";
+import type { IResponse } from "@/types/api.types";
+import { formatCurrency } from "@/lib/utils";
 
 export const ContractList: React.FC = () => {
     const [page, setPage] = useState(1);
@@ -21,6 +26,7 @@ export const ContractList: React.FC = () => {
 
     const { data: response, isLoading } = useContracts({ page, limit: pageSize });
     const { mutate: deleteContract, isPending: isDeleting } = useDeleteContract();
+    const { mutate: downloadContract } = useDownloadContract();
 
     const contracts: Contract[] = response?.data || [];
     const pagination = response?.pagination;
@@ -29,12 +35,19 @@ export const ContractList: React.FC = () => {
         if (!deleteTarget) return;
         deleteContract(deleteTarget, {
             onSuccess: () => { toast.success("Contract deleted."); setDeleteTarget(null); },
-            onError: () => toast.error("Failed to delete contract."),
+            onError: (err) => {
+                if (isAxiosError<IResponse>(err)) {
+                    toast.error(err.response?.data?.message || "Failed to delete contract.");
+                } else {
+                    toast.error("Failed to delete contract.");
+                }
+            },
         });
     };
 
-    if (isLoading) return <div className="p-8 text-center text-muted-foreground">Loading contracts...</div>;
+    if (isLoading) return <div className="flex items-center mx-auto w-fit p-8 space-x-2"><Spinner className="text-primary h-6 w-6" /><p className="text-center text-muted-foreground">Loading contracts ...</p></div>;
 
+    console.log('res', response)
     return (
         <div className="p-6 space-y-6">
             <div className="flex justify-between items-center">
@@ -42,9 +55,16 @@ export const ContractList: React.FC = () => {
                     <h1 className="text-3xl font-bold tracking-tight">Contracts</h1>
                     <p className="text-muted-foreground">Loan contract signing records.</p>
                 </div>
-                <Button onClick={() => setFormOpen(true)}>
-                    <Plus className="mr-2 h-4 w-4" /> New Contract
-                </Button>
+                <div className="flex gap-2">
+                    <Button variant="outline" asChild>
+                        <Link to="/contracts/generator">
+                            <FileText className="mr-2 h-4 w-4" /> Generate Contract
+                        </Link>
+                    </Button>
+                    <Button onClick={() => setFormOpen(true)}>
+                        <Plus className="mr-2 h-4 w-4" /> New Contract
+                    </Button>
+                </div>
             </div>
 
             <Card>
@@ -57,7 +77,8 @@ export const ContractList: React.FC = () => {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Contract #</TableHead>
-                                <TableHead>Loan</TableHead>
+                                <TableHead>Borrower Name</TableHead>
+                                <TableHead>Loan Amount</TableHead>
                                 <TableHead>Signing Date</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
@@ -74,19 +95,28 @@ export const ContractList: React.FC = () => {
                                         <TableRow key={c._id}>
                                             <TableCell>
                                                 <Badge variant="outline" className="font-mono">
-                                                    {c.contractNumber || c._id.slice(-8).toUpperCase()}
+                                                    {c.contractNumber}
                                                 </Badge>
                                             </TableCell>
                                             <TableCell>{borrowerName}</TableCell>
+                                            <TableCell>{formatCurrency(loanInfo?.loanAmount || "0")}</TableCell>
                                             <TableCell>{new Date(c.signingDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</TableCell>
                                             <TableCell className="text-right">
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
                                                         <Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button>
                                                     </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
+                                                    <DropdownMenuContent>
                                                         <DropdownMenuItem
-                                                            className="text-destructive focus:text-destructive"
+                                                            onClick={() => downloadContract({
+                                                                id: c._id,
+                                                                filename: `Contract_${c.contractNumber}.pdf`
+                                                            })}
+                                                        >
+                                                            <Download className="mr-2 h-4 w-4" /> Download
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem
+                                                            variant="destructive"
                                                             onClick={() => setDeleteTarget(c._id)}
                                                         >
                                                             <Trash2 className="mr-2 h-4 w-4" /> Delete

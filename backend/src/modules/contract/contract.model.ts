@@ -5,6 +5,7 @@ export interface IContract extends Document {
     documentPath: string;
     originalName: string;
     signingDate: Date;
+    contractNumber: string;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -15,6 +16,7 @@ const contractSchema = new Schema<IContract>(
         documentPath: { type: String, required: true },
         originalName: { type: String, required: true },
         signingDate: { type: Date, required: true },
+        contractNumber: { type: String, required: true },
     },
     { timestamps: true }
 );

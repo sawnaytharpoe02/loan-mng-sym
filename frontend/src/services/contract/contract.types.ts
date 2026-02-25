@@ -1,11 +1,14 @@
 import type { IResponse, Params } from "../../types/api.types";
 import type { CreateContractDTO } from "@loan-mng/shared";
+import type { Loan } from "../loan/loan.types";
 
 export interface Contract {
     _id: string;
-    loanId: string | { _id: string; loanAmount: string; borrowerId: string | { fullName: string } };
+    loanId: string | Loan;
     signingDate: string;
-    contractNumber?: string;
+    contractNumber: string;
+    originalName: string;
+    documentPath: string;
     createdAt: string;
     updatedAt: string;
 }

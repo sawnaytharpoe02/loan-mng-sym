@@ -23,6 +23,8 @@ import {
 import { useCreateLoan, useUpdateLoan } from "@/services/loan/loan.mutations";
 import { useBorrowers } from "@/services/borrower/borrower.queries";
 import type { Loan } from "@/services/loan/loan.types";
+import { isAxiosError } from "axios";
+import type { IResponse } from "@/types/api.types";
 
 interface LoanFormDialogProps {
     open: boolean;
@@ -73,12 +75,24 @@ export const LoanFormDialog: React.FC<LoanFormDialogProps> = ({ open, onOpenChan
         if (isEdit) {
             update(data, {
                 onSuccess: () => { toast.success("Loan updated!"); onOpenChange(false); },
-                onError: () => toast.error("Failed to update loan."),
+                onError: (err) => {
+                    if (isAxiosError<IResponse>(err)) {
+                        toast.error(err.response?.data?.message || "Failed to update loan.");
+                    } else {
+                        toast.error("Failed to update loan.");
+                    }
+                },
             });
         } else {
             create(data, {
                 onSuccess: () => { toast.success("Loan created!"); onOpenChange(false); },
-                onError: () => toast.error("Failed to create loan."),
+                onError: (err) => {
+                    if (isAxiosError<IResponse>(err)) {
+                        toast.error(err.response?.data?.message || "Failed to create loan.");
+                    } else {
+                        toast.error("Failed to create loan.");
+                    }
+                },
             });
         }
     };

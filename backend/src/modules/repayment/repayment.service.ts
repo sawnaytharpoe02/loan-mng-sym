@@ -82,6 +82,8 @@ export class RepaymentService {
         const repayment = await this.repaymentRepository.create({
             loanId: loan._id as any,
             amountPaid: data.amountPaid,
+            principalPaid: principalPortion.toString(),
+            interestPaid: interestPortion.toString(),
             paymentDate: data.paymentDate ? new Date(data.paymentDate) : new Date(),
             remainingBalance: newBalanceStr,
             paymentTerm: data.paymentTerm || 0,

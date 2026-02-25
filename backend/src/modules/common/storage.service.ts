@@ -40,4 +40,22 @@ export class FileStorageService {
 
         return getSignedUrl(this.client, command, { expiresIn });
     }
+
+    /**
+     * Get a readable stream for a file from S3
+     * @param key The S3 object key
+     */
+    async getFileStream(key: string) {
+        const command = new GetObjectCommand({
+            Bucket: env.AWS.BUCKET_NAME,
+            Key: key,
+        });
+
+        const response = await this.client.send(command);
+        return {
+            stream: response.Body,
+            contentType: response.ContentType,
+            contentLength: response.ContentLength,
+        };
+    }
 }

@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, UserPlus, Mail, Phone, MapPin, CreditCard, Edit, Trash2 } from "lucide-react";
+import { MoreHorizontal, UserPlus, Mail, Phone, MapPin, CreditCard, Edit, Trash2, Search, X } from "lucide-react";
 import { toast } from "sonner";
 import { useBorrowers } from "@/services/borrower/borrower.queries";
 import { useDeleteBorrower } from "@/services/borrower/borrower.mutations";
@@ -12,6 +11,11 @@ import { Pagination } from "@/components/ui/pagination";
 import { DeleteDialog } from "@/components/ui/delete-dialog";
 import { BorrowerFormDialog } from "@/pages/borrower/BorrowerFormDialog";
 import type { Borrower } from "@/services/borrower/borrower.types";
+import { Spinner } from "@/components/ui/spinner";
+import { isAxiosError } from "axios";
+import type { IResponse } from "@/types/api.types";
+import { useDebounce } from "use-debounce";
+import { Input } from "@/components/ui/input";
 
 export const BorrowerList: React.FC = () => {
     const [page, setPage] = useState(1);
@@ -19,8 +23,10 @@ export const BorrowerList: React.FC = () => {
     const [formOpen, setFormOpen] = useState(false);
     const [editTarget, setEditTarget] = useState<Borrower | null>(null);
     const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [debouncedSearch] = useDebounce(searchQuery, 500);
 
-    const { data: response, isLoading } = useBorrowers({ page, limit: pageSize });
+    const { data: response, isLoading } = useBorrowers({ page, limit: pageSize, search: debouncedSearch });
     const { mutate: deleteBorrower, isPending: isDeleting } = useDeleteBorrower();
 
     const handleDelete = () => {
@@ -30,7 +36,13 @@ export const BorrowerList: React.FC = () => {
                 toast.success("Borrower deleted successfully");
                 setDeleteTarget(null);
             },
-            onError: () => toast.error("Failed to delete borrower"),
+            onError: (err) => {
+                if (isAxiosError<IResponse>(err)) {
+                    toast.error(err.response?.data?.message || "Failed to delete borrower");
+                } else {
+                    toast.error("Failed to delete borrower");
+                }
+            },
         });
     };
 
@@ -44,7 +56,7 @@ export const BorrowerList: React.FC = () => {
         setFormOpen(true);
     };
 
-    if (isLoading) return <div className="p-8 text-center text-muted-foreground">Loading borrowers...</div>;
+    if (isLoading) return <div className="flex items-center mx-auto w-fit p-8 space-x-2"><Spinner className="text-primary h-6 w-6" /><p className="text-center text-muted-foreground">Loading borrowers ...</p></div>;
 
     const borrowers = response?.data || [];
     const pagination = response?.pagination;
@@ -56,10 +68,31 @@ export const BorrowerList: React.FC = () => {
                     <h1 className="text-3xl font-bold tracking-tight">Borrowers</h1>
                     <p className="text-muted-foreground">Manage your loan customers and their profiles.</p>
                 </div>
-                <Button onClick={handleNewClick}>
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    New Borrower
-                </Button>
+                <div className="flex items-center space-x-4">
+                    <div className="relative w-64">
+                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            placeholder="Search by name..."
+                            className="pl-8 pr-8"
+                            value={searchQuery}
+                            onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
+                        />
+                        {searchQuery && (
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="absolute right-1 top-1.5 h-6 w-6"
+                                onClick={() => setSearchQuery("")}
+                            >
+                                <X className="h-4 w-4" />
+                            </Button>
+                        )}
+                    </div>
+                    <Button onClick={handleNewClick}>
+                        <UserPlus className="mr-2 h-4 w-4" />
+                        New Borrower
+                    </Button>
+                </div>
             </div>
 
             <Card>
@@ -85,10 +118,10 @@ export const BorrowerList: React.FC = () => {
                                         <TableCell className="font-medium">{borrower.fullName}</TableCell>
                                         <TableCell>
                                             <div className="flex flex-col gap-1">
-                                                <div className="flex items-center text-xs text-muted-foreground">
+                                                <div className="flex items-center text-[13px] text-muted-foreground">
                                                     <Mail className="mr-1 h-3 w-3" />{borrower.email}
                                                 </div>
-                                                <div className="flex items-center text-xs text-muted-foreground">
+                                                <div className="flex items-center text-[13px] text-muted-foreground">
                                                     <Phone className="mr-1 h-3 w-3" />{borrower.phone}
                                                 </div>
                                             </div>

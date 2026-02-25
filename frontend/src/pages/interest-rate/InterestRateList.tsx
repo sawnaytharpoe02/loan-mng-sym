@@ -10,6 +10,7 @@ import { useDeleteInterestRate } from "@/services/interest-rate/interest-rate.mu
 import { MoreHorizontal, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { InterestRateFormDialog } from "./InterestRateFormDialog";
+import { Spinner } from "@/components/ui/spinner";
 
 export const InterestRateList: React.FC = () => {
     const [formOpen, setFormOpen] = useState(false);
@@ -28,7 +29,7 @@ export const InterestRateList: React.FC = () => {
         });
     };
 
-    if (isLoading) return <div className="p-8 text-center text-muted-foreground">Loading interest rates...</div>;
+    if (isLoading) return <div className="flex items-center mx-auto w-fit p-8 space-x-2"><Spinner className="text-primary h-6 w-6" /><p className="text-center text-muted-foreground">Loading interest rates ...</p></div>;
 
     return (
         <div className="p-6 space-y-6">

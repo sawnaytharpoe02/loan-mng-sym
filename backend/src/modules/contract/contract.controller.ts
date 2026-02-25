@@ -18,8 +18,8 @@ export class ContractController {
                 throw ApiError.badRequest("Contract document file is required");
             }
 
-            const { loanId, signingDate } = req.body;
-            const contract = await this.contractService.create(loanId, signingDate, req.file as unknown as IS3File);
+            const { loanId, signingDate, contractNumber } = req.body;
+            const contract = await this.contractService.create(loanId, signingDate, contractNumber, req.file as unknown as IS3File);
             ApiResponse.created(res, "Contract uploaded successfully", contract);
         } catch (error) {
             next(error);
@@ -59,8 +59,16 @@ export class ContractController {
 
     download = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { url } = await this.contractService.getDownloadUrl(req.params.id);
-            res.redirect(url);
+            const { stream, contentType, contentLength, originalName } = await this.contractService.getDownloadData(req.params.id);
+
+            res.setHeader("Content-Type", contentType || "application/octet-stream");
+            if (contentLength) {
+                res.setHeader("Content-Length", contentLength);
+            }
+            res.setHeader("Content-Disposition", `attachment; filename="${originalName}"`);
+
+            // Cast to any to handle AWS SDK v3 stream piping to Express response
+            (stream as any).pipe(res);
         } catch (error) {
             next(error);
         }

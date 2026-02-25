@@ -4,6 +4,8 @@ export interface IRepayment extends Document {
     loanId: mongoose.Types.ObjectId;
     paymentDate: Date;
     amountPaid: string;
+    principalPaid: string;
+    interestPaid: string;
     remainingBalance: string;
     paymentTerm: number;
     createdAt: Date;
@@ -15,6 +17,8 @@ const repaymentSchema = new Schema<IRepayment>(
         loanId: { type: Schema.Types.ObjectId, ref: "Loan", required: true },
         paymentDate: { type: Date, required: true, default: Date.now },
         amountPaid: { type: String, required: true },
+        principalPaid: { type: String, required: true },
+        interestPaid: { type: String, required: true },
         remainingBalance: { type: String, required: true },
         paymentTerm: { type: Number, default: 0 },
     },

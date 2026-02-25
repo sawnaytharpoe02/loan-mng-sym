@@ -104,6 +104,7 @@ export type CreateTransactionDTO = z.infer<typeof createTransactionSchema>;
 export const createContractSchema = z.object({
     loanId: z.string().min(1, "Loan is required"),
     signingDate: z.string().min(1, "Signing date is required"),
+    contractNumber: z.string().min(1, "Contract number is required"),
 });
 export type CreateContractDTO = z.infer<typeof createContractSchema>;
 

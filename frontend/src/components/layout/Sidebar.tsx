@@ -9,11 +9,14 @@ import {
     FileText,
     LogOut,
     Building2,
+    Calculator,
 } from "lucide-react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/auth.store";
 import { Separator } from "@/components/ui/separator";
+import { LoanCalculatorDrawer } from "../calculator/LoanCalculatorDrawer";
 
 const navItems = [
     { path: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -28,6 +31,7 @@ const navItems = [
 export function Sidebar() {
     const { user, logout } = useAuthStore();
     const navigate = useNavigate();
+    const [calcOpen, setCalcOpen] = useState(false);
 
     const handleLogout = () => {
         logout();
@@ -35,7 +39,7 @@ export function Sidebar() {
     };
 
     return (
-        <aside className="flex h-screen w-64 flex-col border-r bg-card">
+        <aside className="flex h-screen w-56 flex-col border-r bg-card">
             {/* Logo */}
             <div className="flex h-16 items-center gap-3 border-b px-5">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
@@ -67,6 +71,16 @@ export function Sidebar() {
                         {label}
                     </NavLink>
                 ))}
+
+                <button
+                    onClick={() => setCalcOpen(true)}
+                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                >
+                    <Calculator className="h-4 w-4 shrink-0" />
+                    Calculator
+                </button>
+
+                <LoanCalculatorDrawer open={calcOpen} onOpenChange={setCalcOpen} />
             </nav>
 
             <Separator />

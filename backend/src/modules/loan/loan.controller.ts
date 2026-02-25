@@ -19,7 +19,8 @@ export class LoanController {
         try {
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 10;
-            const result = await this.loanService.findAll(page, limit);
+            const search = req.query.search as string;
+            const result = await this.loanService.findAll(page, limit, search);
             ApiResponse.paginatedSuccess(res, "Loans retrieved successfully", result.data, result.pagination);
         } catch (error) {
             next(error);

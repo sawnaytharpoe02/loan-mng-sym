@@ -20,7 +20,7 @@ export class ContractService {
         @inject("FileStorageService") private storageService: FileStorageService
     ) { }
 
-    async create(loanId: string, signingDate: string, file: IS3File) {
+    async create(loanId: string, signingDate: string, contractNumber: string, file: IS3File) {
         const loan = await this.loanRepository.findById(loanId);
         if (!loan) {
             throw ApiError.notFound("Loan not found");
@@ -32,6 +32,7 @@ export class ContractService {
             documentPath: file.key,
             originalName: file.originalname,
             signingDate: new Date(signingDate),
+            contractNumber,
         });
     }
 
@@ -88,6 +89,21 @@ export class ContractService {
             contract.originalName
         );
         return { url, originalName: contract.originalName };
+    }
+
+    async getDownloadData(id: string) {
+        const contract = await this.contractRepository.findById(id);
+        if (!contract) {
+            throw ApiError.notFound("Contract not found");
+        }
+
+        const { stream, contentType, contentLength } = await this.storageService.getFileStream(contract.documentPath);
+        return {
+            stream,
+            contentType,
+            contentLength,
+            originalName: contract.originalName
+        };
     }
 
     async delete(id: string) {

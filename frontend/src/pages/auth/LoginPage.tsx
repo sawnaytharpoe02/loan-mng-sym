@@ -11,6 +11,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Field, FieldContent, FieldError, FieldLabel } from "@/components/ui/field";
 import { useLogin } from "@/services/auth/auth.mutations";
 import { useAuthStore } from "@/store/auth.store";
+import { isAxiosError } from "axios";
+import type { IResponse } from "@/types/api.types";
 
 export const LoginPage: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -34,8 +36,12 @@ export const LoginPage: React.FC = () => {
                 toast.success("Welcome back!");
                 navigate("/");
             },
-            onError: () => {
-                toast.error("Invalid email or password.");
+            onError: (err) => {
+                if (isAxiosError<IResponse>(err)) {
+                    toast.error(err.response?.data?.message || "Invalid email or password.");
+                } else {
+                    toast.error("Invalid email or password.");
+                }
             },
         });
     };

@@ -1,13 +1,14 @@
 import type { IResponse, Params } from "../../types/api.types";
 import type { CreateTransactionDTO, TransactionType } from "@loan-mng/shared";
+import type { Loan } from "../loan/loan.types";
 
 export interface Transaction {
     _id: string;
-    loanId: string | { _id: string };
+    loanId: null | Loan;
+    transactionDate: string;
     transactionType: TransactionType;
     amount: string;
     description?: string;
-    transactionDate: string;
     createdAt: string;
     updatedAt: string;
 }

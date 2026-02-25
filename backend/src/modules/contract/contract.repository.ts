@@ -21,7 +21,7 @@ export class ContractRepository {
 
     async findAll(skip: number = 0, limit: number = 10): Promise<{ data: IContract[], total: number }> {
         const [data, total] = await Promise.all([
-            Contract.find().populate("loanId").sort({ createdAt: -1 }).skip(skip).limit(limit),
+            Contract.find().populate({ path: 'loanId', populate: { path: 'borrowerId', model: 'Borrower' } }).sort({ createdAt: -1 }).skip(skip).limit(limit),
             Contract.countDocuments()
         ]);
         return { data, total };

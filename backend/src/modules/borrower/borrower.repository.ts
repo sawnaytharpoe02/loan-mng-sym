@@ -7,10 +7,11 @@ export class BorrowerRepository {
         return Borrower.create(data);
     }
 
-    async findAll(skip: number = 0, limit: number = 10): Promise<{ data: IBorrower[], total: number }> {
+    async findAll(skip: number = 0, limit: number = 10, search?: string): Promise<{ data: IBorrower[], total: number }> {
+        const query = search ? { fullName: { $regex: search, $options: "i" } } : {};
         const [data, total] = await Promise.all([
-            Borrower.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
-            Borrower.countDocuments()
+            Borrower.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit),
+            Borrower.countDocuments(query)
         ]);
         return { data, total };
     }

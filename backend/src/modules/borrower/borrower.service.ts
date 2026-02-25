@@ -17,9 +17,9 @@ export class BorrowerService {
         return this.borrowerRepository.create(data);
     }
 
-    async findAll(page: number = 1, limit: number = 10) {
+    async findAll(page: number = 1, limit: number = 10, search?: string) {
         const skip = (page - 1) * limit;
-        const { data, total } = await this.borrowerRepository.findAll(skip, limit);
+        const { data, total } = await this.borrowerRepository.findAll(skip, limit, search);
 
         const totalPages = Math.ceil(total / limit);
 

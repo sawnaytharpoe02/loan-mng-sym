@@ -1,9 +1,10 @@
 import type { IResponse, Params } from "../../types/api.types";
 import type { CreateLoanDTO, UpdateLoanDTO, LoanType, LoanStatus } from "@loan-mng/shared";
+import type { Borrower } from "../borrower/borrower.types";
 
 export interface Loan {
     _id: string;
-    borrowerId: string | { _id: string; fullName: string; email: string };
+    borrowerId: string | Borrower;
     loanAmount: string;
     loanType: LoanType;
     status: LoanStatus;

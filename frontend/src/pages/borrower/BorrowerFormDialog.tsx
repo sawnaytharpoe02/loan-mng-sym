@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/dialog";
 import { useUpdateBorrower, useCreateBorrower } from "@/services/borrower/borrower.mutations";
 import type { Borrower } from "@/services/borrower/borrower.types";
+import { isAxiosError } from "axios";
+import type { IResponse } from "@/types/api.types";
 
 interface BorrowerFormDialogProps {
     open: boolean;
@@ -67,12 +69,24 @@ export const BorrowerFormDialog: React.FC<BorrowerFormDialogProps> = ({
         if (isEdit && initialData) {
             update({ ...data }, {
                 onSuccess: () => { toast.success("Borrower updated!"); onOpenChange(false); },
-                onError: () => toast.error("Failed to update borrower."),
+                onError: (err) => {
+                    if (isAxiosError<IResponse>(err)) {
+                        toast.error(err.response?.data?.message || "Failed to update borrower.");
+                    } else {
+                        toast.error("Failed to update borrower.");
+                    }
+                },
             });
         } else {
             create(data, {
                 onSuccess: () => { toast.success("Borrower created!"); onOpenChange(false); },
-                onError: () => toast.error("Failed to create borrower."),
+                onError: (err) => {
+                    if (isAxiosError<IResponse>(err)) {
+                        toast.error(err.response?.data?.message || "Failed to create borrower.");
+                    } else {
+                        toast.error("Failed to create borrower.");
+                    }
+                },
             });
         }
     };
@@ -116,7 +130,7 @@ export const BorrowerFormDialog: React.FC<BorrowerFormDialogProps> = ({
                     <Field>
                         <FieldLabel htmlFor="nrc">National ID / NRC</FieldLabel>
                         <FieldContent>
-                            <Input id="nrc" {...register("nrc")} placeholder="ID-12345" aria-invalid={!!errors.nrc} />
+                            <Input id="nrc" {...register("nrc")} placeholder="14/MAMANA(N)101020" aria-invalid={!!errors.nrc} />
                             <FieldError errors={[errors.nrc]} />
                         </FieldContent>
                     </Field>

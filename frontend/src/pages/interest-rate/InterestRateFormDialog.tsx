@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCreateInterestRate } from "@/services/interest-rate/interest-rate.mutations";
+import { isAxiosError } from "axios";
+import type { IResponse } from "@/types/api.types";
 
 const ALLOWED_RATES = ["5", "10", "15", "20"];
 
@@ -41,7 +43,13 @@ export const InterestRateFormDialog: React.FC<InterestRateFormDialogProps> = ({ 
     const onSubmit = (data: CreateInterestRateDTO) => {
         create(data, {
             onSuccess: () => { toast.success("Interest rate created!"); onOpenChange(false); },
-            onError: () => toast.error("Failed to create interest rate."),
+            onError: (err) => {
+                if (isAxiosError<IResponse>(err)) {
+                    toast.error(err.response?.data?.message || "Failed to create interest rate.");
+                } else {
+                    toast.error("Failed to create interest rate.");
+                }
+            },
         });
     };
 

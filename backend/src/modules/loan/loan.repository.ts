@@ -1,5 +1,6 @@
 import { injectable } from "tsyringe";
 import { Loan, ILoan } from "./loan.model";
+import { Borrower } from "../borrower/borrower.model";
 import Decimal from "decimal.js";
 
 @injectable()
@@ -8,10 +9,20 @@ export class LoanRepository {
         return Loan.create(data);
     }
 
-    async findAll(skip: number = 0, limit: number = 10): Promise<{ data: ILoan[], total: number }> {
+    async findAll(skip: number = 0, limit: number = 10, search?: string): Promise<{ data: ILoan[], total: number }> {
+        let query: any = {};
+
+        if (search) {
+            const borrowers = await Borrower.find({
+                fullName: { $regex: search, $options: "i" }
+            }).select("_id");
+            const borrowerIds = borrowers.map(b => b._id);
+            query.borrowerId = { $in: borrowerIds };
+        }
+
         const [data, total] = await Promise.all([
-            Loan.find().populate("borrowerId", "fullName email phone").sort({ createdAt: -1 }).skip(skip).limit(limit),
-            Loan.countDocuments()
+            Loan.find(query).populate("borrowerId", "fullName email phone").sort({ createdAt: -1 }).skip(skip).limit(limit),
+            Loan.countDocuments(query)
         ]);
         return { data, total };
     }

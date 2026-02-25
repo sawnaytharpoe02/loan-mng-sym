@@ -16,6 +16,8 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCreateRepayment } from "@/services/repayment/repayment.mutations";
 import { useLoans } from "@/services/loan/loan.queries";
+import { isAxiosError } from "axios";
+import type { IResponse } from "@/types/api.types";
 
 interface RepaymentFormDialogProps {
     open: boolean;
@@ -52,7 +54,13 @@ export const RepaymentFormDialog: React.FC<RepaymentFormDialogProps> = ({ open, 
     const onSubmit = (data: CreateRepaymentDTO) => {
         create(data, {
             onSuccess: () => { toast.success("Repayment recorded!"); onOpenChange(false); },
-            onError: () => toast.error("Failed to record repayment."),
+            onError: (err) => {
+                if (isAxiosError<IResponse>(err)) {
+                    toast.error(err.response?.data?.message || "Failed to record repayment.");
+                } else {
+                    toast.error("Failed to record repayment.");
+                }
+            },
         });
     };
 
