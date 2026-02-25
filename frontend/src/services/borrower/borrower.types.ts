@@ -6,7 +6,7 @@ export interface Borrower {
     fullName: string;
     email: string;
     phone: string;
-    identificationNumber: string;
+    nrc: string;
     address: string;
     dateOfBirth?: string;
     createdAt: string;

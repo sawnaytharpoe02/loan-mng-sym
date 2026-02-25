@@ -38,7 +38,7 @@ app.use(
 );
 
 // Rate limiting
-app.use(rateLimiter);
+// app.use(rateLimiter);
 
 // Request logging
 app.use((req, _res, next) => {

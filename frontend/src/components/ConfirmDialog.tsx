@@ -1,13 +1,13 @@
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
 
 interface ConfirmDialogProps {
     open: boolean;
@@ -31,26 +31,31 @@ export function ConfirmDialog({
     variant = "default",
 }: ConfirmDialogProps) {
     return (
-        <AlertDialog open={open} onOpenChange={onOpenChange}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>{title}</AlertDialogTitle>
-                    <AlertDialogDescription>
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="min-w-[500px]">
+                <DialogHeader>
+                    <DialogTitle>{title}</DialogTitle>
+                    <DialogDescription>
                         {description}
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogCancel onClick={() => onOpenChange(false)}>
-                        {cancelText}
-                    </AlertDialogCancel>
-                    <AlertDialogAction
-                        onClick={onConfirm}
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                    <DialogClose asChild>
+                        <Button variant="outline">
+                            {cancelText}
+                        </Button>
+                    </DialogClose>
+                    <Button
+                        onClick={() => {
+                            onConfirm();
+                            onOpenChange(false);
+                        }}
                         variant={variant === "destructive" ? "destructive" : "default"}
                     >
                         {confirmText}
-                    </AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     )
 }

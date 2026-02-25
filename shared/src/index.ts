@@ -35,7 +35,7 @@ export const registerSchema = z.object({
     username: z.string().min(3, "Username must be at least 3 characters"),
     email: z.string().email("Invalid email address"),
     password: z.string().min(6, "Password must be at least 6 characters"),
-    role: UserRole.default("Office"),
+    role: UserRole,
 });
 export type RegisterDTO = z.infer<typeof registerSchema>;
 
@@ -114,7 +114,7 @@ export const createInterestRateSchema = z.object({
         { message: "Rate must be 5, 10, 15, or 20" }
     ),
     description: z.string().optional(),
-    isActive: z.boolean().default(true),
+    isActive: z.boolean(),
 });
 export type CreateInterestRateDTO = z.infer<typeof createInterestRateSchema>;
 

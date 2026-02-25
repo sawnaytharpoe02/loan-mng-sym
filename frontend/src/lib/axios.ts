@@ -8,29 +8,35 @@ export const api = axios.create({
     headers: {
         "Content-Type": "application/json",
     },
-    // Add standard timeouts or other configs here if needed
-    timeout: 10000,
 });
 
-// Optional: Add interceptors for handling auth tokens or global errors
+// Inject Bearer token on every request
 api.interceptors.request.use(
     (config) => {
-        // e.g., const token = useAuthStore.getState().token;
-        // if (token) config.headers.Authorization = `Bearer ${token}`
+        try {
+            const authStorage = localStorage.getItem("auth-storage");
+            if (authStorage) {
+                const token = JSON.parse(authStorage)?.state?.token;
+                if (token) {
+                    config.headers.Authorization = `Bearer ${token}`;
+                }
+            }
+        } catch (error) {
+            console.error("Error parsing auth-storage", error);
+        }
         return config;
     },
-    (error) => {
-        return Promise.reject(error);
-    }
+    (error) => Promise.reject(error)
 );
 
+// Redirect to login on 401
 api.interceptors.response.use(
-    (response) => {
-        return response;
-    },
+    (response) => response,
     (error) => {
-        // Handle global errors, e.g., 401 Unauthorized redirect
-        // Use toast/sonner for global error notifications
+        if (error.response?.status === 401) {
+            localStorage.removeItem("auth-storage");
+            window.location.href = "/login";
+        }
         return Promise.reject(error);
     }
 );

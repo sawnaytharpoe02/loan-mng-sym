@@ -1,13 +1,35 @@
-import { BorrowerList } from "./features/borrower/components/BorrowerList";
+import { Routes, Route } from "react-router";
+import { AppLayout } from "@/components/layout/AppLayout";
+import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
+import { LoginPage } from "@/pages/auth/LoginPage";
+import { BorrowerList } from "@/pages/borrower/BorrowerList";
+import { LoanList } from "@/pages/loan/LoanList";
+import { RepaymentList } from "@/pages/repayment/RepaymentList";
+import { InterestRateList } from "@/pages/interest-rate/InterestRateList";
+import { TransactionList } from "@/pages/transaction/TransactionList";
+import { ContractList } from "@/pages/contract/ContractList";
+import { Dashboard } from "@/pages/dashboard/Dashboard";
+import { RegisterPage } from "./pages/auth/RegisterPage";
 
-export function App() {
+export default function App() {
     return (
-        <main className="min-h-screen bg-background">
-            <div className="container mx-auto py-8">
-                <BorrowerList />
-            </div>
-        </main>
-    )
-}
+        <Routes>
+            {/* Public */}
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/login" element={<LoginPage />} />
 
-export default App;
+            {/* Protected shell */}
+            <Route element={<ProtectedRoute />}>
+                <Route element={<AppLayout />}>
+                    <Route index element={<Dashboard />} />
+                    <Route path="borrowers" element={<BorrowerList />} />
+                    <Route path="loans" element={<LoanList />} />
+                    <Route path="repayments" element={<RepaymentList />} />
+                    <Route path="transactions" element={<TransactionList />} />
+                    <Route path="interest-rates" element={<InterestRateList />} />
+                    <Route path="contracts" element={<ContractList />} />
+                </Route>
+            </Route>
+        </Routes>
+    );
+}
