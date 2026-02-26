@@ -7,6 +7,11 @@ export class RepaymentRepository {
         return Repayment.create(data);
     }
 
+    async update(id: string, data: Partial<IRepayment>): Promise<IRepayment | null> {
+        return Repayment.findByIdAndUpdate(id, data, { new: true, runValidators: true })
+            .populate({ path: "loanId", populate: { path: "borrowerId" } });
+    }
+
     async findByLoanId(loanId: string, skip: number = 0, limit: number = 10): Promise<{ data: IRepayment[], total: number }> {
         const [data, total] = await Promise.all([
             Repayment.find({ loanId })

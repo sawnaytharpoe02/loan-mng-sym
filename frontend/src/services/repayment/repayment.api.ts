@@ -1,5 +1,5 @@
 import { api } from "@/lib/axios";
-import type { RepaymentListResponse, RepaymentResponse, CreateRepaymentDTO, RepaymentParams } from "./repayment.types";
+import type { RepaymentListResponse, RepaymentResponse, CreateRepaymentDTO, UpdateRepaymentDTO, RepaymentParams } from "./repayment.types";
 
 export const repaymentApi = {
     getAll: (params?: RepaymentParams) =>
@@ -10,6 +10,8 @@ export const repaymentApi = {
         api.get<RepaymentResponse>(`/repayments/${id}`),
     create: (data: CreateRepaymentDTO) =>
         api.post<RepaymentResponse>("/repayments", data),
+    update: (id: string, data: UpdateRepaymentDTO) =>
+        api.put<RepaymentResponse>(`/repayments/${id}`, data),
     delete: (id: string) =>
         api.delete<RepaymentResponse>(`/repayments/${id}`),
 };

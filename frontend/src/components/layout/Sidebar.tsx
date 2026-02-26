@@ -10,6 +10,7 @@ import {
     LogOut,
     Building2,
     Calculator,
+    User,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -88,11 +89,25 @@ export function Sidebar() {
             {/* User footer */}
             <div className="p-3 space-y-2">
                 {user && (
-                    <div className="px-3 py-2">
-                        <p className="text-sm font-semibold truncate">{user.username}</p>
-                        <p className="text-xs text-muted-foreground truncate">{user.email}</p>
-                        <p className="text-xs text-muted-foreground capitalize">{user.role}</p>
-                    </div>
+                    <NavLink
+                        to="/profile"
+                        className={({ isActive }: { isActive: boolean }) =>
+                            cn(
+                                "flex items-center gap-3 rounded-lg px-3 py-2 transition-colors",
+                                isActive
+                                    ? "bg-accent text-accent-foreground"
+                                    : "hover:bg-accent hover:text-accent-foreground"
+                            )
+                        }
+                    >
+                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                            <User className="h-4 w-4 text-primary" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                            <p className="text-sm font-semibold truncate">{user.username}</p>
+                            <p className="text-xs text-muted-foreground truncate">{user.role}</p>
+                        </div>
+                    </NavLink>
                 )}
                 <Button
                     variant="ghost"

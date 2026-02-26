@@ -4,26 +4,21 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Pagination } from "@/components/ui/pagination";
-import { DeleteDialog } from "@/components/ui/delete-dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { useRepayments, useRepaymentsByLoan } from "@/services/repayment/repayment.queries";
-import { useDeleteRepayment } from "@/services/repayment/repayment.mutations";
-import { MoreHorizontal, Plus, Search, Trash2, X } from "lucide-react";
-import { toast } from "sonner";
+import { MoreHorizontal, Pencil, Plus, Search, X } from "lucide-react";
 import { RepaymentFormDialog } from "@/pages/repayment/RepaymentFormDialog";
 import type { Repayment } from "@/services/repayment/repayment.types";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { Spinner } from "@/components/ui/spinner";
-import { isAxiosError } from "axios";
-import type { IResponse } from "@/types/api.types";
 import { useDebounce } from "use-debounce";
 
 export const RepaymentList: React.FC = () => {
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [formOpen, setFormOpen] = useState(false);
-    const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+    const [editTarget, setEditTarget] = useState<Repayment | null>(null);
     const [searchLoanId, setSearchLoanId] = useState("");
     const [debouncedSearch] = useDebounce(searchLoanId, 500);
 
@@ -38,25 +33,22 @@ export const RepaymentList: React.FC = () => {
         { enabled: !!debouncedSearch }
     );
 
-    const { mutate: deleteRepayment, isPending: isDeleting } = useDeleteRepayment();
-
     const response = (debouncedSearch ? loanResponse : allResponse) as any;
     const isLoading = debouncedSearch ? isLoadingLoan : isLoadingAll;
     const repayments: Repayment[] = response?.data || [];
     const pagination = response?.pagination;
 
-    const handleDelete = () => {
-        if (!deleteTarget) return;
-        deleteRepayment(deleteTarget, {
-            onSuccess: () => { toast.success("Repayment deleted."); setDeleteTarget(null); },
-            onError: (err) => {
-                if (isAxiosError<IResponse>(err)) {
-                    toast.error(err.response?.data?.message || "Failed to delete repayment.");
-                } else {
-                    toast.error("Failed to delete repayment.");
-                }
-            },
-        });
+
+    const handleEdit = (repayment: Repayment) => {
+        setEditTarget(repayment);
+        setFormOpen(true);
+    };
+
+    const handleFormClose = (open: boolean) => {
+        setFormOpen(open);
+        if (!open) {
+            setEditTarget(null);
+        }
     };
 
     if (isLoading) return <div className="flex items-center mx-auto w-fit p-8 space-x-2"><Spinner className="text-primary h-6 w-6" /><p className="text-center text-muted-foreground">Loading repayments ...</p></div>;
@@ -88,7 +80,7 @@ export const RepaymentList: React.FC = () => {
                             </Button>
                         )}
                     </div>
-                    <Button onClick={() => setFormOpen(true)}>
+                    <Button onClick={() => { setEditTarget(null); setFormOpen(true); }}>
                         <Plus className="mr-2 h-4 w-4" /> Record Repayment
                     </Button>
                 </div>
@@ -130,11 +122,8 @@ export const RepaymentList: React.FC = () => {
                                                     <Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem
-                                                        className="text-destructive focus:text-destructive"
-                                                        onClick={() => setDeleteTarget(r._id)}
-                                                    >
-                                                        <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                                    <DropdownMenuItem onClick={() => handleEdit(r)}>
+                                                        <Pencil className="mr-2 h-4 w-4" /> Edit
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -162,16 +151,7 @@ export const RepaymentList: React.FC = () => {
                 </CardContent>
             </Card>
 
-            <RepaymentFormDialog open={formOpen} onOpenChange={setFormOpen} />
-
-            <DeleteDialog
-                open={!!deleteTarget}
-                onOpenChange={(o) => !o && setDeleteTarget(null)}
-                onConfirm={handleDelete}
-                isLoading={isDeleting}
-                title="Delete Repayment"
-                description="This will permanently remove this repayment record."
-            />
+            <RepaymentFormDialog open={formOpen} onOpenChange={handleFormClose} editRepayment={editTarget} />
         </div>
     );
 };

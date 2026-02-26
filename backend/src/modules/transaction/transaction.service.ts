@@ -3,7 +3,6 @@ import { TransactionRepository } from "./transaction.repository";
 import { LoanRepository } from "../loan/loan.repository";
 import { CreateTransactionDTO } from "@loan-mng/shared";
 import { ApiError } from "../../utils/api-error";
-import Decimal from "decimal.js";
 
 @injectable()
 export class TransactionService {
@@ -26,12 +25,6 @@ export class TransactionService {
             description: data.description || "",
         });
 
-        // If it's a late fee or penalty, add to loan remaining balance
-        if (data.transactionType === "LateFee" || data.transactionType === "Penalty") {
-            const newBalance = new Decimal(loan.remainingBalance).plus(new Decimal(data.amount)).toDecimalPlaces(0, Decimal.ROUND_HALF_UP).toString();
-            await this.loanRepository.updateBalance(data.loanId, newBalance);
-        }
-
         return transaction;
     }
 
@@ -52,9 +45,9 @@ export class TransactionService {
         };
     }
 
-    async findAll(page: number = 1, limit: number = 10) {
+    async findAll(page: number = 1, limit: number = 10, transactionType?: string) {
         const skip = (page - 1) * limit;
-        const { data, total } = await this.transactionRepository.findAll(skip, limit);
+        const { data, total } = await this.transactionRepository.findAll(skip, limit, transactionType);
         const totalPages = Math.ceil(total / limit);
         return {
             data,

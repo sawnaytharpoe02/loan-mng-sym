@@ -26,6 +26,10 @@ export const LoginPage: React.FC = () => {
         formState: { errors },
     } = useForm<LoginDTO>({
         resolver: zodResolver(loginSchema),
+        defaultValues: {
+            email: "admin@gmail.com",
+            password: "admin123",
+        }
     });
 
     if (isAuthenticated) return <Navigate to="/" replace />;
@@ -69,7 +73,7 @@ export const LoginPage: React.FC = () => {
                     <CardContent>
                         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                             <Field>
-                                <FieldLabel htmlFor="email">Email Address</FieldLabel>
+                                <FieldLabel>Email Address</FieldLabel>
                                 <FieldContent>
                                     <div className="relative">
                                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -87,7 +91,7 @@ export const LoginPage: React.FC = () => {
                             </Field>
 
                             <Field>
-                                <FieldLabel htmlFor="password">Password</FieldLabel>
+                                <FieldLabel>Password</FieldLabel>
                                 <FieldContent>
                                     <div className="relative">
                                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

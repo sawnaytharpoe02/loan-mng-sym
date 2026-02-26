@@ -14,19 +14,24 @@ import {
     DialogDescription,
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useCreateRepayment } from "@/services/repayment/repayment.mutations";
+import { useCreateRepayment, useUpdateRepayment } from "@/services/repayment/repayment.mutations";
 import { useLoans } from "@/services/loan/loan.queries";
 import { isAxiosError } from "axios";
 import type { IResponse } from "@/types/api.types";
+import type { Repayment } from "@/services/repayment/repayment.types";
 
 interface RepaymentFormDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     preselectedLoanId?: string;
+    editRepayment?: Repayment | null;
 }
 
-export const RepaymentFormDialog: React.FC<RepaymentFormDialogProps> = ({ open, onOpenChange, preselectedLoanId }) => {
-    const { mutate: create, isPending } = useCreateRepayment();
+export const RepaymentFormDialog: React.FC<RepaymentFormDialogProps> = ({ open, onOpenChange, preselectedLoanId, editRepayment }) => {
+    const isEditMode = !!editRepayment;
+    const { mutate: create, isPending: isCreating } = useCreateRepayment();
+    const { mutate: update, isPending: isUpdating } = useUpdateRepayment();
+    const isPending = isCreating || isUpdating;
     const { data: loansResp } = useLoans({ limit: 200 });
     const activeLoans = (loansResp?.data || []).filter((l) => l.status === "Active");
 
@@ -36,6 +41,7 @@ export const RepaymentFormDialog: React.FC<RepaymentFormDialogProps> = ({ open, 
             loanId: preselectedLoanId ?? "",
             amountPaid: "",
             paymentDate: new Date().toISOString().slice(0, 10),
+            paymentTerm: undefined,
         },
     });
 
@@ -43,40 +49,66 @@ export const RepaymentFormDialog: React.FC<RepaymentFormDialogProps> = ({ open, 
 
     React.useEffect(() => {
         if (open) {
-            reset({
-                loanId: preselectedLoanId ?? "",
-                amountPaid: "",
-                paymentDate: new Date().toISOString().slice(0, 10),
-            });
+            if (editRepayment) {
+                const loanId = typeof editRepayment.loanId === "object" ? editRepayment.loanId._id : editRepayment.loanId;
+                reset({
+                    loanId: loanId,
+                    amountPaid: editRepayment.amountPaid,
+                    paymentDate: editRepayment.paymentDate ? new Date(editRepayment.paymentDate).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10),
+                    paymentTerm: editRepayment.paymentTerm ?? undefined,
+                });
+            } else {
+                reset({
+                    loanId: preselectedLoanId ?? "",
+                    amountPaid: "",
+                    paymentDate: new Date().toISOString().slice(0, 10),
+                    paymentTerm: undefined,
+                });
+            }
         }
-    }, [open, preselectedLoanId, reset]);
+    }, [open, preselectedLoanId, editRepayment, reset]);
 
     const onSubmit = (data: CreateRepaymentDTO) => {
-        create(data, {
-            onSuccess: () => { toast.success("Repayment recorded!"); onOpenChange(false); },
-            onError: (err) => {
-                if (isAxiosError<IResponse>(err)) {
-                    toast.error(err.response?.data?.message || "Failed to record repayment.");
-                } else {
-                    toast.error("Failed to record repayment.");
-                }
-            },
-        });
+        if (isEditMode) {
+            update({ id: editRepayment!._id, data }, {
+                onSuccess: () => { toast.success("Repayment updated!"); onOpenChange(false); },
+                onError: (err) => {
+                    if (isAxiosError<IResponse>(err)) {
+                        toast.error(err.response?.data?.message || "Failed to update repayment.");
+                    } else {
+                        toast.error("Failed to update repayment.");
+                    }
+                },
+            });
+        } else {
+            create(data, {
+                onSuccess: () => { toast.success("Repayment recorded!"); onOpenChange(false); },
+                onError: (err) => {
+                    if (isAxiosError<IResponse>(err)) {
+                        toast.error(err.response?.data?.message || "Failed to record repayment.");
+                    } else {
+                        toast.error("Failed to record repayment.");
+                    }
+                },
+            });
+        }
     };
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Record Repayment</DialogTitle>
-                    <DialogDescription>Enter the repayment details for an active loan.</DialogDescription>
+                    <DialogTitle>{isEditMode ? "Edit Repayment" : "Record Repayment"}</DialogTitle>
+                    <DialogDescription>
+                        {isEditMode ? "Update the repayment details. Balance will be recalculated." : "Enter the repayment details for an active loan."}
+                    </DialogDescription>
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-2">
                     <Field>
                         <FieldLabel>Loan</FieldLabel>
                         <FieldContent>
-                            <Select value={selectedLoan} onValueChange={(v) => setValue("loanId", v)}>
+                            <Select value={selectedLoan} onValueChange={(v) => setValue("loanId", v)} disabled={isEditMode}>
                                 <SelectTrigger aria-invalid={!!errors.loanId} className="w-full">
                                     <SelectValue placeholder="Select loan..." />
                                 </SelectTrigger>
@@ -111,9 +143,19 @@ export const RepaymentFormDialog: React.FC<RepaymentFormDialogProps> = ({ open, 
                         </FieldContent>
                     </Field>
 
+                    <Field>
+                        <FieldLabel>Payment Term</FieldLabel>
+                        <FieldContent>
+                            <Input type="number" {...register("paymentTerm", { valueAsNumber: true })} aria-invalid={!!errors.paymentTerm} />
+                            <FieldError errors={[errors.paymentTerm]} />
+                        </FieldContent>
+                    </Field>
+
                     <div className="flex justify-end gap-3 pt-2">
                         <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isPending}>Cancel</Button>
-                        <Button type="submit" disabled={isPending}>{isPending ? "Recording..." : "Record Repayment"}</Button>
+                        <Button type="submit" disabled={isPending}>
+                            {isPending ? (isEditMode ? "Updating..." : "Recording...") : (isEditMode ? "Update Repayment" : "Record Repayment")}
+                        </Button>
                     </div>
                 </form>
             </DialogContent>

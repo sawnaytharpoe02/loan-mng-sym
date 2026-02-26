@@ -82,10 +82,13 @@ export type UpdateLoanDTO = z.infer<typeof updateLoanSchema>;
 export const createRepaymentSchema = z.object({
     loanId: z.string().min(1, "Loan is required"),
     amountPaid: PositiveDecimalSchema,
-    paymentDate: z.string().optional(),
-    paymentTerm: z.number().int().positive().optional(),
+    paymentDate: z.string(),
+    paymentTerm: z.number().int().positive(),
 });
 export type CreateRepaymentDTO = z.infer<typeof createRepaymentSchema>;
+
+export const updateRepaymentSchema = createRepaymentSchema.partial();
+export type UpdateRepaymentDTO = z.infer<typeof updateRepaymentSchema>;
 
 // Transaction Schemas
 export const TransactionType = z.enum(["Repayment", "LateFee", "Penalty"]);

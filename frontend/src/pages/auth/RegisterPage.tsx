@@ -77,7 +77,7 @@ export const RegisterPage: React.FC = () => {
                     <CardContent>
                         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                             <Field>
-                                <FieldLabel htmlFor="username">Full Name</FieldLabel>
+                                <FieldLabel>Full Name</FieldLabel>
                                 <FieldContent>
                                     <div className="relative">
                                         <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -94,7 +94,7 @@ export const RegisterPage: React.FC = () => {
                             </Field>
 
                             <Field>
-                                <FieldLabel htmlFor="email">Email Address</FieldLabel>
+                                <FieldLabel>Email Address</FieldLabel>
                                 <FieldContent>
                                     <div className="relative">
                                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -112,7 +112,7 @@ export const RegisterPage: React.FC = () => {
                             </Field>
 
                             <Field>
-                                <FieldLabel htmlFor="role">Account Role</FieldLabel>
+                                <FieldLabel>Account Role</FieldLabel>
                                 <FieldContent>
                                     <div className="relative">
                                         <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
@@ -137,7 +137,7 @@ export const RegisterPage: React.FC = () => {
                             </Field>
 
                             <Field>
-                                <FieldLabel htmlFor="password">Password</FieldLabel>
+                                <FieldLabel>Password</FieldLabel>
                                 <FieldContent>
                                     <div className="relative">
                                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

@@ -19,7 +19,8 @@ export class TransactionController {
         try {
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 10;
-            const result = await this.transactionService.findAll(page, limit);
+            const type = req.query.type as string | undefined;
+            const result = await this.transactionService.findAll(page, limit, type);
             ApiResponse.paginatedSuccess(res, "Transactions retrieved successfully", result.data, result.pagination);
         } catch (error) {
             next(error);

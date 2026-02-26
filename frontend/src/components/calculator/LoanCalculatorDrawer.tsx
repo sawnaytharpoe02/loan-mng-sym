@@ -40,7 +40,7 @@ export const LoanCalculatorDrawer: React.FC<LoanCalculatorDrawerProps> = ({ open
 
     return (
         <Drawer open={open} onOpenChange={onOpenChange}>
-            <DrawerContent className="max-h-[96vh]">
+            <DrawerContent className="min-h-fit">
                 <div className="mx-auto w-full max-w-4xl">
                     <DrawerHeader>
                         <div className="flex items-center justify-between">

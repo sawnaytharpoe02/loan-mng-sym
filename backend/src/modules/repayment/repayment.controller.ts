@@ -15,6 +15,15 @@ export class RepaymentController {
         }
     };
 
+    update = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const repayment = await this.repaymentService.update(req.params.id, req.body);
+            ApiResponse.ok(res, "Repayment updated successfully", repayment);
+        } catch (error) {
+            next(error);
+        }
+    };
+
     findAll = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const page = parseInt(req.query.page as string) || 1;

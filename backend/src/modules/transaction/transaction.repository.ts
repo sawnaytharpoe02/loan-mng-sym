@@ -15,10 +15,14 @@ export class TransactionRepository {
         return { data, total };
     }
 
-    async findAll(skip: number = 0, limit: number = 10): Promise<{ data: ITransaction[], total: number }> {
+    async findAll(skip: number = 0, limit: number = 10, transactionType?: string): Promise<{ data: ITransaction[], total: number }> {
+        const query: any = {};
+        if (transactionType) {
+            query.transactionType = transactionType;
+        }
         const [data, total] = await Promise.all([
-            Transaction.find().populate("loanId").sort({ createdAt: -1 }).skip(skip).limit(limit),
-            Transaction.countDocuments()
+            Transaction.find(query).populate("loanId").sort({ createdAt: -1 }).skip(skip).limit(limit),
+            Transaction.countDocuments(query)
         ]);
         return { data, total };
     }

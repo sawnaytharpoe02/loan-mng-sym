@@ -16,6 +16,7 @@ export function useTransactionsByLoan(loanId: string, params?: TransactionParams
     return useQuery({
         queryKey: QUERY_KEY.TRANSACTIONS_BY_LOAN(loanId),
         queryFn: () => transactionApi.getByLoanId(loanId, params).then((r) => r.data),
+        placeholderData: keepPreviousData,
         enabled: !!loanId,
         staleTime: 5 * 60 * 1000, // 5 minutes
     });

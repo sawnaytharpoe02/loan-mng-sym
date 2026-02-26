@@ -9,6 +9,7 @@ import { InterestRateList } from "@/pages/interest-rate/InterestRateList";
 import { TransactionList } from "@/pages/transaction/TransactionList";
 import { ContractList } from "@/pages/contract/ContractList";
 import { ContractGenerator } from "@/pages/contract/ContractGenerator";
+import { ProfilePage } from "@/pages/profile/ProfilePage";
 import { Dashboard } from "@/pages/dashboard/Dashboard";
 import { RegisterPage } from "./pages/auth/RegisterPage";
 
@@ -23,6 +24,7 @@ export default function App() {
             <Route element={<ProtectedRoute />}>
                 <Route element={<AppLayout />}>
                     <Route index element={<Dashboard />} />
+                    <Route path="profile" element={<ProfilePage />} />
                     <Route path="borrowers" element={<BorrowerList />} />
                     <Route path="loans" element={<LoanList />} />
                     <Route path="repayments" element={<RepaymentList />} />

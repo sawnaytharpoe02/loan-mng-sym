@@ -1,5 +1,5 @@
 import type { IResponse, Params } from "../../types/api.types";
-import type { CreateRepaymentDTO } from "@loan-mng/shared";
+import type { CreateRepaymentDTO, UpdateRepaymentDTO } from "@loan-mng/shared";
 import type { Loan } from "../loan/loan.types";
 
 export interface Repayment {
@@ -18,5 +18,5 @@ export interface Repayment {
 export type RepaymentListResponse = IResponse<Repayment[]>;
 export type RepaymentResponse = IResponse<Repayment>;
 
-export type { CreateRepaymentDTO };
+export type { CreateRepaymentDTO, UpdateRepaymentDTO };
 export type { Params as RepaymentParams };
