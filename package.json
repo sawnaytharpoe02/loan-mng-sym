@@ -5,5 +5,14 @@
     "shared",
     "backend",
     "frontend"
-  ]
+  ],
+  "scripts": {
+    "dev:backend": "npm run dev -w @loan-mng/backend",
+    "dev:frontend": "npm run dev -w @loan-mng/frontend",
+    "build:shared": "npm run build -w @loan-mng/shared",
+    "build:backend": "npm run build -w @loan-mng/backend",
+    "build:frontend": "npm run build -w @loan-mng/frontend",
+    "docker:build:frontend": "docker build -t loan-mng-frontend:latest -f frontend/Dockerfile .",
+    "docker:build:backend": "docker build -t loan-mng-backend:latest -f backend/Dockerfile ."
+  }
 }
