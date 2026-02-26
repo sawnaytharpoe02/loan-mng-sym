@@ -90,10 +90,17 @@ function FieldContent({ className, ...props }: React.ComponentProps<"div">) {
 
 function FieldLabel({
   className,
+  htmlFor,
+  children,
   ...props
-}: React.ComponentProps<typeof Label>) {
+}: {
+  className?: string
+  htmlFor?: string
+  children?: React.ReactNode
+} & React.HTMLAttributes<HTMLLabelElement>) {
   return (
     <Label
+      htmlFor={htmlFor}
       data-slot="field-label"
       className={cn(
         "has-data-checked:bg-primary/5 has-data-checked:border-primary/30 dark:has-data-checked:border-primary/20 dark:has-data-checked:bg-primary/10 gap-2 group-data-[disabled=true]/field:opacity-50 has-[>[data-slot=field]]:rounded-lg has-[>[data-slot=field]]:border *:data-[slot=field]:p-2.5 group/field-label peer/field-label flex w-fit leading-snug",
@@ -101,7 +108,9 @@ function FieldLabel({
         className
       )}
       {...props}
-    />
+    >
+      {children}
+    </Label>
   )
 }
 
@@ -137,9 +146,10 @@ function FieldSeparator({
   children,
   className,
   ...props
-}: React.ComponentProps<"div"> & {
+}: {
   children?: React.ReactNode
-}) {
+  className?: string
+} & React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       data-slot="field-separator"
@@ -147,7 +157,7 @@ function FieldSeparator({
       className={cn("-my-2 h-5 text-sm group-data-[variant=outline]/field-group:-mb-2 relative", className)}
       {...props}
     >
-      <Separator className="absolute inset-0 top-1/2" />
+      <Separator orientation="horizontal" className="absolute inset-0 top-1/2" />
       {children && (
         <span
           className="text-muted-foreground px-2 bg-background relative mx-auto block w-fit"

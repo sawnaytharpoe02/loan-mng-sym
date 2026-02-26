@@ -1,10 +1,10 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { transactionApi } from "./transaction.api";
 import { QUERY_KEY } from "@/lib/query-keys";
-import type { TransactionParams } from "./transaction.types";
+import type { TransactionParams, TransactionListResponse } from "./transaction.types";
 
 export function useTransactions(params?: TransactionParams) {
-    return useQuery({
+    return useQuery<TransactionListResponse, Error>({
         queryKey: [...QUERY_KEY.TRANSACTIONS, params],
         queryFn: () => transactionApi.getAll(params).then((r) => r.data),
         placeholderData: keepPreviousData,

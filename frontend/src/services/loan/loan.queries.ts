@@ -1,10 +1,10 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { loanApi } from "./loan.api";
 import { QUERY_KEY } from "@/lib/query-keys";
-import type { LoanParams } from "./loan.types";
+import type { LoanParams, LoanListResponse } from "./loan.types";
 
 export function useLoans(params?: LoanParams) {
-    return useQuery({
+    return useQuery<LoanListResponse, Error>({
         queryKey: [...QUERY_KEY.LOANS, params],
         queryFn: () => loanApi.getAll(params).then((r) => r.data),
         placeholderData: keepPreviousData,

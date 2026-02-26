@@ -103,7 +103,7 @@ export const BorrowerFormDialog: React.FC<BorrowerFormDialogProps> = ({
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-2">
                     <Field>
-                        <FieldLabel htmlFor="fullName">Full Name</FieldLabel>
+                        <FieldLabel>Full Name</FieldLabel>
                         <FieldContent>
                             <Input id="fullName" {...register("fullName")} placeholder="John Doe" aria-invalid={!!errors.fullName} />
                             <FieldError errors={[errors.fullName]} />
@@ -112,14 +112,14 @@ export const BorrowerFormDialog: React.FC<BorrowerFormDialogProps> = ({
 
                     <div className="grid grid-cols-2 gap-4">
                         <Field>
-                            <FieldLabel htmlFor="email">Email</FieldLabel>
+                            <FieldLabel>Email</FieldLabel>
                             <FieldContent>
                                 <Input id="email" type="email" {...register("email")} placeholder="john@example.com" aria-invalid={!!errors.email} />
                                 <FieldError errors={[errors.email]} />
                             </FieldContent>
                         </Field>
                         <Field>
-                            <FieldLabel htmlFor="phone">Phone</FieldLabel>
+                            <FieldLabel>Phone</FieldLabel>
                             <FieldContent>
                                 <Input id="phone" {...register("phone")} placeholder="+1234567890" aria-invalid={!!errors.phone} />
                                 <FieldError errors={[errors.phone]} />
@@ -128,7 +128,7 @@ export const BorrowerFormDialog: React.FC<BorrowerFormDialogProps> = ({
                     </div>
 
                     <Field>
-                        <FieldLabel htmlFor="nrc">National ID / NRC</FieldLabel>
+                        <FieldLabel>National ID / NRC</FieldLabel>
                         <FieldContent>
                             <Input id="nrc" {...register("nrc")} placeholder="14/MAMANA(N)101020" aria-invalid={!!errors.nrc} />
                             <FieldError errors={[errors.nrc]} />
@@ -136,7 +136,7 @@ export const BorrowerFormDialog: React.FC<BorrowerFormDialogProps> = ({
                     </Field>
 
                     <Field>
-                        <FieldLabel htmlFor="address">Address</FieldLabel>
+                        <FieldLabel>Address</FieldLabel>
                         <FieldContent>
                             <Textarea id="address" {...register("address")} placeholder="123 Main St, City, Country" className="min-h-[80px]" aria-invalid={!!errors.address} />
                             <FieldError errors={[errors.address]} />
